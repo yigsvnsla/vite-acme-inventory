@@ -11,9 +11,8 @@ import {
   FormMessage,
   Form as FormProvider,
 } from "~/components/ui/form";
-import { Form } from "react-router";
-import { signInSchema, type SignInSchema } from "~/schemas/sign-in.schema";
-
+import { Form, Link } from "react-router";
+import { signUpSchema, type SignUpSchema } from "~/schemas/sign-up.schema";
 import { typeboxResolver } from "@hookform/resolvers/typebox";
 import { useRemixForm } from "remix-hook-form";
 import { authClient } from "~/libs/auth.client";
@@ -23,7 +22,7 @@ import { TerminalIcon } from "lucide-react";
 import { BetterFetchError } from "@better-fetch/fetch";
 import SpinnerCircle4 from "./customized/spinner/spinner-10";
 
-export function LoginForm({
+export function SignUpForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
@@ -33,21 +32,20 @@ export function LoginForm({
     isError,
     error,
   } = useMutation({
-    mutationFn: async (data: SignInSchema) => {
-      return await authClient.signIn.email(
+    mutationFn: async (data: SignUpSchema) => {
+      return await authClient.signUp.email(
         {
-          callbackURL: "/dashboard",
-          rememberMe: true,
           ...data,
+          callbackURL: "/dashboard",
         },
         { throw: true }
       );
     },
   });
 
-  const form = useRemixForm<SignInSchema>({
+  const form = useRemixForm<SignUpSchema>({
     mode: "onSubmit",
-    resolver: typeboxResolver(signInSchema),
+    resolver: typeboxResolver(signUpSchema),
     submitHandlers: {
       onValid: async (data) => {
         console.log("Received data:", data);
@@ -55,8 +53,9 @@ export function LoginForm({
       },
     },
     defaultValues: {
-      email: "adara_spees@msn.com",
-      password: "",
+      name: "Firstname Lastname",
+      email: "admin@admin.com",
+      password: "password123456",
     },
   });
 
@@ -92,12 +91,35 @@ export function LoginForm({
                     </AlertDescription>
                   </Alert>
                 ) : null}
+
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem className="grid gap-2">
+                      <FormLabel className="capitalize" htmlFor="name">
+                        name
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          id="name"
+                          type="text"
+                          placeholder=""
+                          required
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="email"
                   render={({ field }) => (
                     <FormItem className="grid gap-2">
-                      <FormLabel className="capitalize" htmlFor="name">
+                      <FormLabel className="capitalize" htmlFor="email">
                         email
                       </FormLabel>
                       <FormControl>
@@ -180,10 +202,10 @@ export function LoginForm({
                   </Button>
                 </div>
                 <div className="text-center text-sm">
-                  Don&apos;t have an account?{" "}
-                  <a href="#" className="underline underline-offset-4">
-                    Sign up
-                  </a>
+                  have an account?{" "}
+                  <Link to="/auth/sign-in" className="underline underline-offset-4 capitalize">
+                    sign in
+                  </Link>
                 </div>
               </div>
             </Form>

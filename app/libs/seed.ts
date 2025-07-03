@@ -1,4 +1,4 @@
-import { Seed, users, type SeedConfig } from "@better-auth-kit/seed";
+import { $, Seed, users, type SeedConfig } from "@better-auth-kit/seed";
 
 export const config: SeedConfig = {
     deleteRowsBeforeSeeding: {
@@ -10,5 +10,9 @@ export const config: SeedConfig = {
 
 export const seed = Seed({
     // Adds 100 users (including sessions and accounts)
-    ...users(),
+    ...users({
+        account:{
+            password: $.password(()=> "password123456"),
+        }
+    }),
 });

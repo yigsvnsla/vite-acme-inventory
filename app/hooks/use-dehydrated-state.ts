@@ -1,4 +1,4 @@
-// * REF: https://github.com/maplegrove-io/use-dehydrated-state/issues/3 F
+// * REF: https://github.com/maplegrove-io/use-dehydrated-state/issues/3
 
 // Taken from https://github.com/maplegrove-io/use-dehydrated-state
 import type { DehydratedState } from '@tanstack/react-query'
