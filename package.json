@@ -4,13 +4,15 @@
   "type": "module",
   "scripts": {
     "build": "react-router build",
-    "dev": "react-router dev",
+    "dev": "bun --bun react-router dev",
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc",
     "::db-push": "bun --bun drizzle-kit push",
-    "::db-generate": "bun drizzle-kit generate",
-    "::db-migrate": "bun drizzle-kit migrate",
-    "::auth-generate": "bunx --bun @better-auth/cli generate --config ./app/libs/auth.server.ts --output ./app/database/schemas/auth.schema.ts --y"
+    "::db-generate": "bun --bun  drizzle-kit generate",
+    "::db-migrate": "bun --bun  drizzle-kit migrate",
+    "::auth-generate": "bunx --bun @better-auth/cli generate --config ./app/libs/auth.server.ts --output ./app/database/schemas/auth.schema.ts --y",
+    "::auth-seed": "bunx --bun @better-auth-kit/cli@latest seed --config ./app/libs/auth.server.ts",
+    "generate": "bun ::auth-generate && bun ::db-generate && bun ::db-push && bun ::auth-seed"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
@@ -19,6 +21,7 @@
     "@react-router/node": "^7.5.3",
     "@react-router/serve": "^7.5.3",
     "@sinclair/typebox": "^0.34.37",
+    "@tanstack/react-query": "^5.81.5",
     "better-auth": "^1.2.12",
     "better-sqlite3": "^12.2.0",
     "class-variance-authority": "^0.7.1",
@@ -32,12 +35,15 @@
     "react-router": "^7.5.3",
     "remix-hook-form": "^7.1.0",
     "tailwind-merge": "^3.3.1",
+    "use-dehydrated-state": "^0.1.0",
     "zod": "^3.25.67"
   },
   "devDependencies": {
+    "@better-auth-kit/seed": "^1.0.12",
     "@libsql/client": "^0.15.9",
     "@react-router/dev": "^7.5.3",
     "@tailwindcss/vite": "^4.1.4",
+    "@tanstack/eslint-plugin-query": "^5.81.2",
     "@types/better-sqlite3": "^7.6.13",
     "@types/bun": "^1.2.17",
     "@types/node": "^20",

@@ -2,7 +2,6 @@ import { cn } from "~/libs/utils";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
 import ImgPlaceHolder from "~/assets/placeholder.svg";
 import {
   FormControl,
@@ -17,14 +16,48 @@ import { signInSchema, type SignInSchema } from "~/schemas/sign-in.schema";
 
 import { typeboxResolver } from "@hookform/resolvers/typebox";
 import { useRemixForm } from "remix-hook-form";
+import { authClient } from "~/libs/auth.client";
+import { useMutation } from "@tanstack/react-query";
+import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
+import { TerminalIcon } from "lucide-react";
+import { BetterFetchError } from "@better-fetch/fetch";
+import SpinnerCircle4 from "./customized/spinner/spinner-10";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const {
+    mutateAsync: login,
+    isPending,
+    isError,
+    error,
+  } = useMutation({
+    mutationFn: async (data: SignInSchema) => {
+      return await authClient.signIn.email(
+        {
+          callbackURL: "/dashboard",
+          rememberMe: true,
+          ...data,
+        },
+        { throw: true }
+      );
+    },
+  });
+
   const form = useRemixForm<SignInSchema>({
     mode: "onSubmit",
     resolver: typeboxResolver(signInSchema),
+    submitHandlers: {
+      onValid: async (data) => {
+        console.log("Received data:", data);
+        login(data);
+      },
+    },
+    defaultValues: {
+      email: "adara_spees@msn.com",
+      password: "",
+    },
   });
 
   return (
@@ -44,7 +77,21 @@ export function LoginForm({
                     Login to your Acme Inc account
                   </p>
                 </div>
-
+                {isError ? (
+                  <Alert variant="destructive">
+                    <TerminalIcon className="text-destructive" />
+                    <AlertTitle className="capitalize">
+                      {error instanceof BetterFetchError
+                        ? error.message
+                        : "Login failed"}
+                    </AlertTitle>
+                    <AlertDescription className="capitalize">
+                      {error instanceof BetterFetchError
+                        ? error.error.message
+                        : "Unknown error"}
+                    </AlertDescription>
+                  </Alert>
+                ) : null}
                 <FormField
                   control={form.control}
                   name="email"
@@ -95,8 +142,8 @@ export function LoginForm({
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full">
-                  Login
+                <Button disabled={isPending} type="submit" className="w-full">
+                  {isPending ? <SpinnerCircle4 /> : "Login"}
                 </Button>
                 <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
                   <span className="bg-card text-muted-foreground relative z-10 px-2">

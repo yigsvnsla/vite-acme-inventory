@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "8c3360d8-1dc8-4dbe-91ad-3333a5dbb312",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "5fc2ca1b-46bf-4065-9235-ccac0cf6f36a",
+  "prevId": "8c3360d8-1dc8-4dbe-91ad-3333a5dbb312",
   "tables": {
     "accounts": {
       "name": "accounts",
@@ -177,6 +177,13 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "impersonated_by": {
+          "name": "impersonated_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {
@@ -257,6 +264,34 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
+          "autoincrement": false
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "banned": {
+          "name": "banned",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "ban_reason": {
+          "name": "ban_reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "ban_expires": {
+          "name": "ban_expires",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
           "autoincrement": false
         }
       },

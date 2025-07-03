@@ -5,6 +5,6 @@ export default defineConfig(<Config>{
 	schema: "./app/database/schemas/*",
 	dialect: "sqlite",
 	dbCredentials: {
-		url: import.meta.env.DB_FILE_PATH!,
+		url: import.meta.env.VITE_DB_FILE_PATH!,
 	},
 });

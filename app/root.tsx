@@ -6,9 +6,15 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
-
+import {
+  QueryClient,
+  QueryClientProvider,
+  HydrationBoundary,
+} from "@tanstack/react-query";
 import type { Route } from "./+types/root";
 import "./app.css";
+import { useState } from "react";
+import { useDehydratedState } from "~/hooks/use-dehydrated-state";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -24,8 +30,22 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            // With SSR, we usually want to set some default staleTime
+            // above 0 to avoid refetching immediately on the client
+            staleTime: 60 * 1000,
+          },
+        },
+      })
+  );
+  const dehydratedState = useDehydratedState();
+
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -33,7 +53,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {children}
+        <QueryClientProvider client={queryClient}>
+          <HydrationBoundary state={dehydratedState}>
+            {children}
+          </HydrationBoundary>
+        </QueryClientProvider>
         <ScrollRestoration />
         <Scripts />
       </body>

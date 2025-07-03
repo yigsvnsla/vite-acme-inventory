@@ -3,6 +3,7 @@ import type { Route } from "../sign-in/+types";
 import { typeboxResolver } from "@hookform/resolvers/typebox";
 import { signInSchema, type SignInSchema } from "~/schemas/sign-in.schema";
 import { getValidatedFormData } from "remix-hook-form";
+import type { ClientActionFunctionArgs } from "react-router";
 
 export const action = async ({ request }: Route.ActionArgs) => {
   const {
@@ -26,7 +27,7 @@ export const action = async ({ request }: Route.ActionArgs) => {
 export default function LoginPage() {
   return (
     <div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-sm md:max-w-3xl">
+      <div className="w-full max-w-sm md:max-w-5xl">
         <LoginForm />
       </div>
     </div>
