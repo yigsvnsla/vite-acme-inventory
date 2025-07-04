@@ -5,6 +5,8 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
+  type LoaderFunctionArgs,
 } from "react-router";
 import {
   QueryClient,
@@ -15,6 +17,13 @@ import type { Route } from "./+types/root";
 import "./app.css";
 import { useState } from "react";
 import { useDehydratedState } from "~/hooks/use-dehydrated-state";
+import {
+  PreventFlashOnWrongTheme,
+  ThemeProvider,
+  useTheme,
+} from "remix-themes";
+import { themeSessionResolver } from "./sessions.server";
+import { cn } from "./libs/utils";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -29,7 +38,37 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
+// Return the theme from the session storage using the loader
+export async function loader({ request }: LoaderFunctionArgs) {
+  const { getTheme } = await themeSessionResolver(request);
+  return {
+    theme: getTheme(),
+  };
+}
+
 export function Layout({ children }: { children: React.ReactNode }) {
+  const data = useLoaderData<typeof loader>();
+  const [theme] = useTheme();
+
+  return (
+    <html lang="en" className={cn(theme)}>
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <PreventFlashOnWrongTheme ssrTheme={Boolean(data.theme)} />
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        {children}
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+
+export default function App() {
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -42,31 +81,20 @@ export function Layout({ children }: { children: React.ReactNode }) {
         },
       })
   );
+  const data = useLoaderData<typeof loader>();
   const dehydratedState = useDehydratedState();
-
   return (
-    <html lang="en" className="dark">
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <Meta />
-        <Links />
-      </head>
-      <body>
-        <QueryClientProvider client={queryClient}>
-          <HydrationBoundary state={dehydratedState}>
-            {children}
-          </HydrationBoundary>
-        </QueryClientProvider>
-        <ScrollRestoration />
-        <Scripts />
-      </body>
-    </html>
+    <QueryClientProvider client={queryClient}>
+      <HydrationBoundary state={dehydratedState}>
+        <ThemeProvider
+          specifiedTheme={data.theme}
+          themeAction="/action/set-theme"
+        >
+          <Outlet />
+        </ThemeProvider>
+      </HydrationBoundary>
+    </QueryClientProvider>
   );
-}
-
-export default function App() {
-  return <Outlet />;
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

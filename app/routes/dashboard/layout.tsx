@@ -1,17 +1,30 @@
-import { Outlet } from "react-router";
-import { AppSidebar } from "~/components/app-sidebar"
-import { DataTable } from "~/components/data-table"
-import { SectionCards } from "~/components/section-cards"
-import { SiteHeader } from "~/components/site-header"
-import {
-  SidebarInset,
-  SidebarProvider,
-} from "~/components/ui/sidebar"
-import data from "./data.json"
+import { Outlet, redirect } from "react-router";
+import { AppSidebar } from "~/components/app-sidebar";
+import { DataTable } from "~/components/data-table";
+import { SectionCards } from "~/components/section-cards";
+import { SiteHeader } from "~/components/site-header";
+import { SidebarInset, SidebarProvider } from "~/components/ui/sidebar";
+import data from "./data.json";
+import type { Route } from "./+types/layout";
+import { authClient } from "~/libs/auth.client";
+import { SplashScreen } from "~/components/splash-screen";
+
+export async function clientLoader({ request }: Route.ClientLoaderArgs) {
+  const { data, error } = await authClient.getSession();
+
+  if (!data) throw redirect("/auth/sign-in");
+  console.log({ data, error });
+
+  return data;
+}
+
+export function HydrateFallback() {
+  return <SplashScreen />;
+}
 
 export default function DashboardLayout() {
   return (
-   <SidebarProvider
+    <SidebarProvider
       style={
         {
           "--sidebar-width": "calc(var(--spacing) * 72)",
